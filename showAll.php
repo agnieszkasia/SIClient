@@ -55,123 +55,135 @@ require 'lib/nusoap.php';
 
                         <tbody style='font-size: 12px; border: none'>
 
-                    <form method='post' action="">
+                        <form method='post' action="">
 
-                        <!-- Liczba laptopów o danego producenta-->
-                        <select class="btn border m-2 mt-2" name = 'manufacturer' >
-                            <option value=" ">Wybierz producenta</option>
+                            <!-- Liczba laptopów o danego producenta-->
+                            <select class="btn border m-2 mt-2" name = 'manufacturer' >
+                                <option value=" ">Wybierz producenta</option>
+
+                                <?php
+                                $response = $client->call('getLaptopByManufacturers',array());
+                                $manufacturers = explode(';', $response);
+                                foreach ($manufacturers as $manufacturer){
+                                    if ($_POST['manufacturer'] == $manufacturer){
+                                        $option = ' selected ';
+
+                                    }
+                                    else $option = '';
+                                    echo ' <option value="'.$manufacturer.'" '.$option.'>'.$manufacturer.'</option>';
+                                }
+                                ?>
+                            </select>
+
+                            <input class="btn btn-dark m-2 mt-2" type="submit" name="submit" value="Liczba laptopów producenta">
+
 
                             <?php
-                            $response = $client->call('getLaptopByManufacturers',array());
-                            $manufacturers = explode(';', $response);
-                            foreach ($manufacturers as $manufacturer){
-                                if ($_POST['manufacturer'] == $manufacturer){
-                                    $option = ' selected ';
+                            $response = 0;
+                            if (isset($_POST['manufacturer'])){
+                                $manufacturer = $_POST['manufacturer'];
 
-                                }
-                                else $option = '';
-                                echo ' <option value="'.$manufacturer.'" '.$option.'>'.$manufacturer.'</option>';
+                                $response = $client->call('getQuantityOfLaptopsByManufacturer',
+                                    array("manufacturer"=>$manufacturer));
+
                             }
+                            echo '<input class="btn border m-2 mt-2 mr-5" style="width: 60px" value="'.$response.'">';
                             ?>
-                        </select>
 
-                        <input class="btn btn-dark m-2 mt-2" type="submit" name="submit" value="Liczba laptopów producenta">
+                            <!-- Liczba laptopów o danej proporcji ekranu-->
+                            <select class="ml-5 btn border m-2 mt-2" name = 'proportion' >
+                                <option value="">Wybierz proporcje ekranu</option>
+                                <?php
+                                $response = $client->call('getLaptopsScreenProportion',array());
+                                $proportions = explode(';', $response);
+                                foreach ($proportions as $proportion){
+                                    if ($_POST['proportion'] == $proportion){
+                                        $option = ' selected ';
 
+                                    }
+                                    else $option = '';
+                                    echo ' <option value="'.$proportion.'" '.$option.'>'.$proportion.'</option>';
+                                }
+                                ?>
+                            </select>
 
-                        <?php
-                        $response = 0;
-                        if (isset($_POST['manufacturer'])){
-                            $manufacturer = $_POST['manufacturer'];
-
-                            $response = $client->call('getQuantityOfLaptopsByManufacturer',
-                                array("manufacturer"=>$manufacturer));
-
-                        }
-                        echo '<input class="btn border  m-2 mt-2 col-1" value="'.$response.'">';
-                        ?>
-
-
-
-
-                        <!-- Pobieranie danych o laptopach o danym typie ekranu-->
-                        <select class="btn border m-2 mt-2" name = 'screen_type' >
-                            <option value="">Wybierz typ ekranu</option>
+                            <input class="btn btn-dark m-2 mt-2" type="submit" name="submit" value="Liczba laptopów">
 
                             <?php
-                            $response = $client->call('getLaptopsScreenType',array());
-                            $screenTypes = explode(';', $response);
-                            foreach ($screenTypes as $screenType){
-                                if ($_POST['screen_type'] == $screenType){
-                                    $option = ' selected ';
+                            $response = 0;
+                            if (isset($_POST['proportion'])){
+                                $proportion = $_POST['proportion'];
 
-                                }
-                                else $option = '';
-                                echo ' <option value="'.$screenType.'" '.$option.'>'.$screenType.'</option>';
+                                $response = $client->call('getLaptopsByScreenProportion',
+                                    array("proportion"=>$proportion));
+
                             }
+                            echo '<input class="btn border m-2 mt-2 mr-5" style="width: 60px" value="'.$response.'">';
                             ?>
-                        </select>
 
-                        <input class="btn btn-dark m-2 mt-2" type="submit" name="submit" value="Lista laptopów">
-                        <?php
-                        $response = 0;
-                        if (isset($_POST['screen_type'])) {
-                            $screenType = $_POST['screen_type'];
 
-                            $response = $client->call('getLaptopsByScreenType',
-                                array("screenType" => $screenType));
+                            <!-- Pobieranie danych o laptopach o danym typie ekranu-->
+                            <select class=" ml-5 btn border m-2 mt-2" name = 'screen_type' >
+                                <option value="">Wybierz typ ekranu</option>
 
-                            $str = explode('|',$response);
+                                <?php
+                                $response = $client->call('getLaptopsScreenType',array());
+                                $screenTypes = explode(';', $response);
+                                foreach ($screenTypes as $screenType){
+                                    if ($_POST['screen_type'] == $screenType){
+                                        $option = ' selected ';
+
+                                    }
+                                    else $option = '';
+                                    echo ' <option value="'.$screenType.'" '.$option.'>'.$screenType.'</option>';
+                                }
+                                ?>
+                            </select>
+
+                            <input class="btn btn-dark m-2 mt-2" type="submit" name="submit" value="Lista laptopów">
+                            <?php
                             $i=0;
-                            foreach ($str as $row){
-                                $data[$i] = explode(';',$row);
-                                $i++;
+                            $response = 0;
+                            if (isset($_POST['screen_type'])) {
+                                $data[] = array();
+                                if ($_POST['screen_type'] == "błyszcząca") $screenType = 'blyszczaca';
+                                else $screenType = $_POST['screen_type'];
+
+
+                                $response = $client->call('getLaptopsByScreenType',
+                                    array("screenType" => $screenType));
+
+                                $str = json_decode($response, true);
+                                foreach ($str as $row){
+                                    $data[$i] = json_decode($row, true);
+                                    $i++;
+                                }
                             }
-                        }
-                            for ($j=0; $j<$i; $j++){ ?>
+                            for ($j=0; $j<$i; $j++){
+                                if ($data[$j]['screen_type'] == 'blyszczaca') $data[$j]['screen_type'] = "błyszcząca";
+
+                                    ?>
                                 <tr id="row">
-                                    <?php for ($k=0; $k<15; $k++){ ?>
-                                    <td><?php if ($data[$j][$k]){ echo $data[$j][$k];} else echo 'brak danych' ?></td>
-                                    <?php } ?>
+                                    <td><?php if ($data[$j]['manufacturer']){ echo $data[$j]['manufacturer'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['screen_size']){ echo $data[$j]['screen_size'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['screen_resolution']){ echo $data[$j]['screen_resolution'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['screen_type']){ echo $data[$j]['screen_type'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['screen_touch']){ echo $data[$j]['screen_touch'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['processor_name']){ echo $data[$j]['processor_name'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['processor_physical_cores']){ echo $data[$j]['processor_physical_cores'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['processor_clock_speed']){ echo $data[$j]['processor_clock_speed'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['ram']){ echo $data[$j]['ram'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['disc_type']){ echo $data[$j]['disc_type'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['disc_storage']){ echo $data[$j]['disc_storage'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['graphic_card_name']){ echo $data[$j]['graphic_card_name'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['graphic_card_memory']){ echo $data[$j]['graphic_card_memory'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['os']){ echo $data[$j]['os'];} else echo 'brak danych' ?></td>
+                                    <td><?php if ($data[$j]['disc_reader']){ echo $data[$j]['disc_reader'];} else echo 'brak danych' ?></td>
                                 </tr>
                             <?php } ?>
-
-
-
-                        <!-- Liczba laptopów o danej proporcji ekranu-->
-                        <br/>
-                        <select class="btn border m-2 mt-2" name = 'proportion' >
-                            <option value="">Wybierz proporcje ekranu</option>
-                            <?php
-                            $response = $client->call('getLaptopsScreenProportion',array());
-                            $proportions = explode(';', $response);
-                            foreach ($proportions as $proportion){
-                                if ($_POST['proportion'] == $proportion){
-                                    $option = ' selected ';
-
-                                }
-                                else $option = '';
-                                echo ' <option value="'.$proportion.'" '.$option.'>'.$proportion.'</option>';
-                            }
-                            ?>
-                        </select>
-
-                        <input class="btn btn-dark m-2 mt-2" type="submit" name="submit" value="Liczba laptopów">
-
-                        <?php
-                        $response = 0;
-                        if (isset($_POST['proportion'])){
-                            $proportion = $_POST['proportion'];
-
-                            $response = $client->call('getLaptopsByScreenProportion',
-                                array("proportion"=>$proportion));
-
-                        }
-                        echo '<input class="btn border  m-2 mt-2 col-1" value="'.$response.'">';
-                        ?>
-                    </form>
-                        </tbody>
-                    </table>
-
+                        </form>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
