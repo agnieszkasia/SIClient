@@ -13,7 +13,7 @@ Project is created with:
 To run this project, you must download the System Integration Project application (https://github.com/agnieszkasia/SystemIntegrationProject) and:
 
 * Download this project
-* Put project folder (SIIClient) inside htdocs folder (path is something like this C:\xampp\htdocs)
+* Put project folder (SIClient) inside htdocs folder (path is something like this C:\xampp\htdocs)
 * Start the Apache server in the XAMPP Control Panel
 * Go to the browser and type in URL field: localhost/SIClient/index.php
 
