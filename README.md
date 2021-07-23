@@ -21,3 +21,9 @@ To run this project, you must download the System Integration Project applicatio
 * Displaying the number of laptops from a given manufacturer
 * Display the number of laptops with a given aspect ratio
 * Display a list of laptops with a given screen type
+
+![System Integration Client](./images/1.jpg)
+
+![System Integration Client - show All](./images/2.jpg)
+
+![System Integration Client - select](./images/3a.jpg)
